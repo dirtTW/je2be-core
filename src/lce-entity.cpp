@@ -26,7 +26,7 @@ public:
     if (!rawId) {
       return nullopt;
     }
-    u8string id = MigrateName(*rawId);
+    u8string id = MigrateName(in, *rawId);
     assert(id.starts_with(u8"minecraft:"));
 
     auto out = Default(in, ctx);
@@ -81,12 +81,18 @@ public:
     return ret.release();
   }
 
-  static std::u8string MigrateName(std::u8string const &rawName) {
+  static std::u8string MigrateName(CompoundTag const &in, std::u8string const &rawName) {
     using namespace std;
     u8string name = Namespace::Remove(strings::SnakeFromUpperCamel(rawName));
     static unique_ptr<unordered_map<u8string, u8string> const> const sTable(CreateNameMigrationTable());
     if (auto found = sTable->find(name); found != sTable->end()) {
       name = found->second;
+    }
+    if (name == u8"minecart") {
+      auto handItemsB = in.listTag(u8"Items");
+      if (handItemsB) {
+        name = u8"chest_minecart";
+      }
     }
     return u8"minecraft:" + name;
   }
@@ -396,7 +402,7 @@ private:
     if (!idB) {
       return nullptr;
     }
-    auto idJ = MigrateName(*idB);
+    auto idJ = MigrateName(in, *idB);
     ret->set(u8"id", idJ);
 
     if (auto drownedConversionTime = in.int32(u8"DrownedConversionTime"); drownedConversionTime) {
@@ -517,8 +523,8 @@ std::optional<Entity::Result> Entity::Convert(CompoundTag const &in, Context con
   return Impl::Convert(in, ctx);
 }
 
-std::u8string Entity::MigrateName(std::u8string const &rawName) {
-  return Impl::MigrateName(rawName);
+std::u8string Entity::MigrateName(CompoundTag const &in, std::u8string const &rawName) {
+  return Impl::MigrateName(in, rawName);
 }
 
 std::optional<Uuid> Entity::MigrateUuid(std::u8string const &uuid, Context const &ctx) {

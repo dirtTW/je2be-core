@@ -740,7 +740,7 @@ private:
     if (auto tag = in.compoundTag(u8"tag"); tag) {
       if (auto entityTag = tag->compoundTag(u8"EntityTag"); entityTag) {
         if (auto id = entityTag->string(u8"id"); id) {
-          auto n = ctx.fEntityNameMigrator(*id);
+          auto n = ctx.fEntityNameMigrator(in, *id);
           if (n.starts_with(u8"minecraft:")) {
             name = n.substr(10);
           }
