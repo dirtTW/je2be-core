@@ -18,7 +18,7 @@ public:
 
   static std::optional<Result> Convert(CompoundTag const &in, Context const &ctx);
 
-  static std::u8string MigrateName(std::u8string const &rawName);
+  static std::u8string MigrateName(CompoundTag const &in, std::u8string const &rawName);
 
   static std::optional<Uuid> MigrateUuid(std::u8string const &uuid, Context const &ctx);
 

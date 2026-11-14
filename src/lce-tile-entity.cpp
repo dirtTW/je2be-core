@@ -291,7 +291,7 @@ public:
     if (auto entityId = in.string(u8"EntityId"); entityId) {
       // TU0
       auto dataJ = Compound();
-      auto idJ = ctx.fEntityNameMigrator(*entityId);
+      auto idJ = ctx.fEntityNameMigrator(in, *entityId);
       auto entity = Compound();
       entity->set(u8"id", idJ);
       dataJ->set(u8"entity", entity);
@@ -302,7 +302,7 @@ public:
       if (auto dataB = in.compoundTag(u8"SpawnData"); dataB) {
         auto dataJ = Compound();
         if (auto idB = dataB->string(u8"id"); idB) {
-          auto idJ = ctx.fEntityNameMigrator(*idB);
+          auto idJ = ctx.fEntityNameMigrator(in, *idB);
           auto entity = Compound();
           entity->set(u8"id", idJ);
           dataJ->set(u8"entity", entity);
@@ -319,7 +319,7 @@ public:
           auto potentialJ = potentialB->copy();
           if (auto entity = potentialJ->compoundTag(u8"Entity"); entity) {
             if (auto idB = entity->string(u8"id"); idB) {
-              entity->set(u8"id", ctx.fEntityNameMigrator(*idB));
+              entity->set(u8"id", ctx.fEntityNameMigrator(in, *idB));
             }
           }
           potentialsJ->push_back(potentialJ);

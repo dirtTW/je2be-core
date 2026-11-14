@@ -11,7 +11,7 @@ namespace je2be::lce {
 class Context {
 public:
   using TileEntityConverter = std::function<std::optional<TileEntityConvertResult>(CompoundTag const &in, std::shared_ptr<mcfile::je::Block const> const &block, Pos3i const &pos, Context const &ctx)>;
-  using EntityNameMigrator = std::function<std::u8string(std::u8string const &)>;
+  using EntityNameMigrator = std::function<std::u8string(CompoundTag const &in, std::u8string const &)>;
 
   Context(TileEntityConverter tileEntityConverter, EntityNameMigrator entityNameMigrator)
       : fTileEntityConverter(tileEntityConverter), fEntityNameMigrator(entityNameMigrator), fNewSeaLevel(false) {}
