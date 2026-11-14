@@ -2,3 +2,9 @@
 *.mcworld filter=lfs diff=lfs merge=lfs -text
 *.bin filter=lfs diff=lfs merge=lfs -text
 *.zip filter=lfs diff=lfs merge=lfs -text
+
+# Dependency patches are applied by the `patch` tool during configure, which
+# compares bytes: a CRLF working copy (core.autocrlf=true) makes them fail with
+# "different line endings". Keep them exactly as committed.
+*.patch -text
+cmake/patches/*.patch -text
