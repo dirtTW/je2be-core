@@ -454,7 +454,8 @@ set(test_files
   test/system.test.hpp
   test/b2j2b.test.hpp
   test/bedrock-legacy-block.test.hpp
-  test/parallel.test.hpp)
+  test/parallel.test.hpp
+  test/java-chunk-section.test.hpp)
 
 if (NOT "${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
   list(APPEND je2be_link_libraries pthread)

@@ -46,3 +46,4 @@ static fs::path ProjectRootDir() {
 #include "b2j2b.test.hpp"
 #include "bedrock-legacy-block.test.hpp"
 #include "parallel.test.hpp"
+#include "java-chunk-section.test.hpp"
