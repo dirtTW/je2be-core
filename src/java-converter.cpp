@@ -13,6 +13,8 @@
 #include <je2be/java/options.hpp>
 #include <je2be/java/progress.hpp>
 
+#include <atomic>
+
 #include "_directory-iterator.hpp"
 #include "_parallel.hpp"
 #include "db/_concurrent-db.hpp"

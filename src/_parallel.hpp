@@ -2,6 +2,7 @@
 
 #include <je2be/status.hpp>
 
+#include <atomic>
 #include <functional>
 #include <latch>
 #include <mutex>

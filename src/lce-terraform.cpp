@@ -2,6 +2,8 @@
 
 #include <je2be/lce/progress.hpp>
 
+#include <atomic>
+
 #include "_nullable.hpp"
 #include "_poi-blocks.hpp"
 #include "_queue2d.hpp"
