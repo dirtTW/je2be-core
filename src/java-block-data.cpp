@@ -2821,7 +2821,7 @@ CompoundTagPtr BlockData::From(std::shared_ptr<mcfile::je::Block const> const &i
   // id unconditionally would therefore rename every block newer than that library to
   // "minecraft:", losing it. Keep the name the chunk itself used in that case, so a block
   // this version does not know still reaches `Identity` with the name it really had.
-  std::u8string name = input->fId == mcfile::blocks::unknown ? input->fName : mcfile::blocks::Name(input->fId, dataVersion.fTarget);
+  std::u8string name = input->fId == mcfile::blocks::unknown ? std::u8string(input->fName) : mcfile::blocks::Name(input->fId, dataVersion.fTarget);
   auto block = make_shared<mcfile::je::Block>(input->fId, name, u8string(input->fData), dataVersion.fTarget);
   u32 index = static_cast<u32>(block->fId);
   if (index < table->size()) {
