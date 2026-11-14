@@ -52,7 +52,7 @@ public:
       // 26.1 keeps each dimension's region/entities/poi under dimensions/minecraft/<name>.
       // Fall back to the pre-26.1 layout when that folder is absent, so both world
       // versions convert with the same build.
-      error_code ec;
+      std::error_code ec;
       fs::path modern = root / "dimensions" / "minecraft" / ModernDimensionName(dim);
       if (fs::is_directory(modern, ec)) {
         return modern;
