@@ -59,7 +59,7 @@ index 96728cb..f344e78 100644
  
      // Functions need to update when new biomes will be released:
 diff --git a/include/mcfile/je/chunksection/chunk-section-118.hpp b/include/mcfile/je/chunksection/chunk-section-118.hpp
-index 54b29b4..630a535 100644
+index 54b29b4..efa32ea 100644
 --- a/include/mcfile/je/chunksection/chunk-section-118.hpp
 +++ b/include/mcfile/je/chunksection/chunk-section-118.hpp
 @@ -54,16 +54,32 @@ public:
@@ -79,7 +79,7 @@ index 54b29b4..630a535 100644
 +                // block resource location may be carried under an empty key, and the whole
 +                // palette may be a list of strings rather than a list of compounds.
 +                u8string name;
-+                shared_ptr<CompoundTag> propertiesTag;
++                shared_ptr<nbt::CompoundTag> propertiesTag;
 +                if (auto tag = entry->asCompound(); tag) {
 +                    if (auto n = tag->string(u8"Name"); n) {
 +                        name = *n;
