@@ -31,6 +31,16 @@ if ("${CMAKE_PROJECT_NAME}" STREQUAL "${PROJECT_NAME}")
   endif()
 endif()
 
+if (EMSCRIPTEN)
+  # libdeflate, which libminecraft-file pulls in, builds a static and a shared
+  # library by default, both named "deflate" outside Windows. Emscripten has no
+  # shared libraries, so the "shared" target is an archive too, and the two
+  # targets write the same file: ninja then refuses to generate with
+  # "multiple rules generate _deps/libdeflate-build/libdeflate.a". Nothing here
+  # links the shared library, so switch it off before libminecraft-file adds it.
+  set(LIBDEFLATE_BUILD_SHARED_LIB OFF CACHE BOOL "" FORCE)
+endif()
+
 CPMAddPackage(
   NAME libminecraft-file
   GITHUB_REPOSITORY kbinani/libminecraft-file
