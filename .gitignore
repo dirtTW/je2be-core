@@ -1,4 +1,6 @@
 /build
+/build-native
+/build-wasm
 /xcode
 *.mca
 *.dat_old
