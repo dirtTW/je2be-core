@@ -67,7 +67,7 @@ public:
       return JE2BE_ERROR;
     }
 
-    auto localPlayerData = LocalPlayerData(*data, *levelData);
+    auto localPlayerData = LocalPlayerData(*data, input, o, *levelData);
     if (localPlayerData) {
       auto k = mcfile::be::DbKey::LocalPlayer();
       if (auto st = db.put(k, *localPlayerData); !st.ok()) {
@@ -222,7 +222,7 @@ public:
     }
   }
 
-  static std::optional<std::string> LocalPlayerData(CompoundTag const &tag, LevelData &ld) {
+  static std::optional<std::string> LocalPlayerData(CompoundTag const &tag, std::filesystem::path const &input, Options const &o, LevelData &ld) {
     using namespace std;
     using namespace mcfile::stream;
 
@@ -230,7 +230,7 @@ public:
     if (!data) {
       return std::nullopt;
     }
-    auto playerJ = data->compoundTag(u8"Player");
+    auto playerJ = ResolveLocalPlayer(*data, input, o);
     if (!playerJ) {
       return std::nullopt;
     }
@@ -336,6 +336,59 @@ public:
   }
 
 private:
+  /// @brief The player entity to convert as the world's local player.
+  ///
+  /// Before 26.1 this was level.dat's Data.Player. 26.1 replaced that tag with a
+  /// singleplayer_uuid reference and moved the entity itself into
+  /// players/data/<uuid>.dat, so that file is read instead. A singleplayer world has
+  /// exactly one player file; if several are present the most recently written one is
+  /// used, which is the one the player last logged out with.
+  static CompoundTagPtr ResolveLocalPlayer(CompoundTag const &levelDatData, std::filesystem::path const &input, Options const &o) {
+    using namespace std;
+    namespace fs = std::filesystem;
+    using namespace mcfile::stream;
+
+    if (auto player = levelDatData.compoundTag(u8"Player"); player) {
+      return player;
+    }
+
+    error_code ec;
+    auto dir = o.getPlayersDataDirectory(input);
+    if (!fs::is_directory(dir, ec)) {
+      return nullptr;
+    }
+
+    fs::path newest;
+    fs::file_time_type newestTime{};
+    for (DirectoryIterator itr(dir); itr.valid(); itr.next()) {
+      if (!itr->is_regular_file()) {
+        continue;
+      }
+      if (!itr->path().filename().string().ends_with(".dat")) {
+        continue;
+      }
+      auto t = itr->last_write_time(ec);
+      if (ec) {
+        continue;
+      }
+      if (newest.empty() || t > newestTime) {
+        newest = itr->path();
+        newestTime = t;
+      }
+    }
+    if (newest.empty()) {
+      return nullptr;
+    }
+
+    auto player = Compound();
+    auto s = make_shared<GzFileInputStream>(newest);
+    InputStreamReader r(s);
+    if (!player->read(r)) {
+      return nullptr;
+    }
+    return player;
+  }
+
   static double GetTotalNumChunks(std::filesystem::path const &input, Options o) {
     namespace fs = std::filesystem;
     u32 num = 0;

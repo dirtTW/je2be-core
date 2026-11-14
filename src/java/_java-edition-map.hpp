@@ -39,7 +39,7 @@ public:
     namespace fs = std::filesystem;
     using namespace mcfile::stream;
 
-    auto jeFilePath = opt.getDataDirectory(input) / ("map_" + to_string(mapId) + ".dat");
+    auto jeFilePath = opt.getMapFilePath(input, mapId);
     error_code ec;
     if (!fs::is_regular_file(jeFilePath, ec)) {
       return nullptr;
@@ -61,7 +61,9 @@ private:
     namespace fs = std::filesystem;
     std::unordered_map<i32, i8> table;
 
-    auto dataDir = opt.getDataDirectory(input);
+    // 26.1 moved the maps into a "maps" subfolder of the data directory and dropped the
+    // "map_" prefix from the file names; both layouts are read here.
+    auto dataDir = opt.getMapDirectory(input);
     if (!fs::exists(dataDir)) {
       return table;
     }
@@ -71,7 +73,7 @@ private:
         continue;
       }
       auto name = itr->path().filename().u8string();
-      if (!name.starts_with(u8"map_") || !name.ends_with(u8".dat")) {
+      if (!name.ends_with(u8".dat")) {
         continue;
       }
       auto numberStr = strings::RemovePrefixAndSuffix(u8"map_", name, u8".dat");
