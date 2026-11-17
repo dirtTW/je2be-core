@@ -1690,10 +1690,10 @@ private:
         }
       } else {
         auto color = Wrap<u8string>(c->string(u8"Color"), u8"black");
-        auto text1 = GetTextComponent(c->string(u8"Text1", u8""));
-        auto text2 = GetTextComponent(c->string(u8"Text2", u8""));
-        auto text3 = GetTextComponent(c->string(u8"Text3", u8""));
-        auto text4 = GetTextComponent(c->string(u8"Text4", u8""));
+        auto text1 = NormalizeSignLine(GetTextComponent(c->string(u8"Text1", u8"")));
+        auto text2 = NormalizeSignLine(GetTextComponent(c->string(u8"Text2", u8"")));
+        auto text3 = NormalizeSignLine(GetTextComponent(c->string(u8"Text3", u8"")));
+        auto text4 = NormalizeSignLine(GetTextComponent(c->string(u8"Text4", u8"")));
         Rgba signTextColor = SignColor::BedrockTexteColorFromJavaColorCode(ColorCodeJavaFromJavaName(color));
         bool glowing = c->boolean(u8"GlowingText", false);
         u8string text = text1 + u8"\x0a" + text2 + u8"\x0a" + text3 + u8"\x0a" + text4;
@@ -1924,6 +1924,10 @@ private:
     tag->set(u8"isMovable", Bool(true));
     tag->set(u8"id", id);
     return tag;
+  }
+
+  static std::u8string NormalizeSignLine(std::u8string const &line) {
+    return line == u8"null" ? u8"" : line;
   }
 
   static CompoundTagPtr SignTextEmpty() {
