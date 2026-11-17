@@ -2591,6 +2591,7 @@ public:
 
     E(happy_ghast, C(Same, LivingEntity, Age, InLove, HappyGhast));
     E(copper_golem, C(Same, LivingEntity, CopperGolem));
+    E(sulfur_cube, C(Same, LivingEntity, BodyEquipmentFromArmorItems));
 #undef E
     return ret;
   }

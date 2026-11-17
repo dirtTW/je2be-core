@@ -697,7 +697,7 @@ private:
     E(breeze, C(Monster, Definitions({u8"+minecraft:breeze"})));
 
     E(creaking, C(Monster, Definitions({u8"+minecraft:creaking"}), Creaking));
-    for (std::u8string type : {u8"oak", u8"spruce", u8"birch", u8"jungle", u8"acacia", u8"dark_oak", u8"mangrove", u8"cherry", u8"pale_oak"}) {
+    for (std::u8string type : {u8"oak", u8"spruce", u8"birch", u8"jungle", u8"acacia", u8"dark_oak", u8"mangrove", u8"cherry", u8"pale_oak", u8"poplar"}) {
       table->try_emplace(type + u8"_boat", C(EntityBase, Vehicle(), TypedBoat(u8"boat", type)));
       table->try_emplace(type + u8"_chest_boat", C(EntityBase, Vehicle(), ChestItemsFromItems, TypedBoat(u8"chest_boat", type)));
     }
@@ -707,6 +707,7 @@ private:
     E(happy_ghast, C(Animal, HappyGhast));
 
     E(copper_golem, C(Mob, CopperGolem));
+    E(sulfur_cube, C(Mob));
 #undef A
 #undef M
 #undef E

@@ -803,6 +803,10 @@ private:
     E(pink_bundle, Bundle);
     E(pale_oak_boat, DefaultItem);
     E(pale_oak_chest_boat, DefaultItem);
+    E(poplar_boat, DefaultItem);
+    E(poplar_chest_boat, DefaultItem);
+    E(sulfur_cube_bucket, DefaultItem);
+    E(sulfur_cube_spawn_egg, DefaultItem);
     E(resin_brick, DefaultItem);
     E(field_masoned_banner_pattern, DefaultItem);
     E(bordure_indented_banner_pattern, DefaultItem);

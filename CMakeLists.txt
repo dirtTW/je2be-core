@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.16)
 project(je2be)
 
+if(MSVC)
+  add_compile_options(/MP)
+endif()
+
 include(cmake/CPM.cmake)
 
 option(JE2BE_CORE_USE_INTEL_COMPILER OFF)
