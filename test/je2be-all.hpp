@@ -57,6 +57,7 @@
 #include "item/_banner.hpp"
 #include "item/_tipped-arrow-potion.hpp"
 #include "item/_map-color.hpp"
+#include "item/_map-type.hpp"
 #include "item/_goat-horn.hpp"
 
 #include "entity/_painting.hpp"

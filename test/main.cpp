@@ -50,3 +50,4 @@ static fs::path ProjectRootDir() {
 #include "blocks-26.3.test.hpp"
 #include "bedrock-26.63.test.hpp"
 #include "blocks-26.3-bedrock.test.hpp"
+#include "map-type.test.hpp"
