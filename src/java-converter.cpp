@@ -477,9 +477,8 @@ private:
   ///
   /// Before 26.1 this was level.dat's Data.Player. 26.1 replaced that tag with a
   /// singleplayer_uuid reference and moved the entity itself into
-  /// players/data/<uuid>.dat, so that file is read instead. A singleplayer world has
-  /// exactly one player file; if several are present the most recently written one is
-  /// used, which is the one the player last logged out with.
+  /// players/data/<uuid>.dat, so that file is read instead. If the reference is absent
+  /// (older or server worlds), fall back to the most recently written player file.
   static CompoundTagPtr ResolveLocalPlayer(CompoundTag const &levelDatData, std::filesystem::path const &input, Options const &o) {
     using namespace std;
     namespace fs = std::filesystem;
@@ -493,6 +492,16 @@ private:
     auto dir = o.getPlayersDataDirectory(input);
     if (!fs::is_directory(dir, ec)) {
       return nullptr;
+    }
+
+    if (auto uuid = props::GetUuidWithFormatIntArray(levelDatData, u8"singleplayer_uuid"); uuid) {
+      auto path = dir / (uuid->toString() + u8".dat");
+      if (fs::is_regular_file(path, ec)) {
+        auto s = make_shared<GzFileInputStream>(path);
+        if (auto player = CompoundTag::Read(s, mcfile::Encoding::Java); player) {
+          return player;
+        }
+      }
     }
 
     fs::path newest;
