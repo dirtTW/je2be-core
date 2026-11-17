@@ -860,6 +860,25 @@ private:
     E(copper_shovel, DefaultItem);
     E(copper_axe, DefaultItem);
     E(copper_hoe, DefaultItem);
+    E(wooden_spear, DefaultItem);
+    E(stone_spear, DefaultItem);
+    E(copper_spear, DefaultItem);
+    E(iron_spear, DefaultItem);
+    E(golden_spear, DefaultItem);
+    E(diamond_spear, DefaultItem);
+    E(netherite_spear, DefaultItem);
+    E(copper_nautilus_armor, DefaultItem);
+    E(iron_nautilus_armor, DefaultItem);
+    E(golden_nautilus_armor, DefaultItem);
+    E(diamond_nautilus_armor, DefaultItem);
+    E(netherite_nautilus_armor, DefaultItem);
+    E(camel_husk_spawn_egg, DefaultItem);
+    E(nautilus_spawn_egg, DefaultItem);
+    E(parched_spawn_egg, DefaultItem);
+    E(zombie_nautilus_spawn_egg, DefaultItem);
+    for (std::u8string const &name : {u8"white_cushion", u8"orange_cushion", u8"magenta_cushion", u8"light_blue_cushion", u8"yellow_cushion", u8"lime_cushion", u8"pink_cushion", u8"gray_cushion", u8"light_gray_cushion", u8"cyan_cushion", u8"purple_cushion", u8"blue_cushion", u8"brown_cushion", u8"green_cushion", u8"red_cushion", u8"black_cushion"}) {
+      table->try_emplace(name, DefaultItem);
+    }
 #undef E
     return table;
   }
