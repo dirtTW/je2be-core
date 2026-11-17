@@ -1381,6 +1381,7 @@ public:
 
     E(end_gateway, EndGateway);
     E(decorated_pot, DecoratedPot);
+    E(potent_sulfur, SameNameEmpty);
     E(suspicious_sand, BrushableBlock);
     E(suspicious_gravel, BrushableBlock);
     E(jigsaw, Jigsaw);

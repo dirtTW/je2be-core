@@ -338,6 +338,7 @@ private:
 
     E(chiseled_bookshelf, ChiseledBookshelf);
     E(decorated_pot, DecoratedPot);
+    E(potent_sulfur, PotentSulfur);
     E(suspicious_sand, BrushableBlock);
     E(suspicious_gravel, BrushableBlock);
     E(jigsaw, Jigsaw);
@@ -1816,6 +1817,12 @@ private:
       }
     }
     return bedrock;
+  }
+
+  static CompoundTagPtr PotentSulfur(Pos3i const &pos, Block const &, CompoundTagPtr const &c, Context &, DataVersion const &) {
+    auto tag = New(u8"PotentSulfurBlock");
+    Attach(c, pos, *tag);
+    return tag;
   }
 
   static CompoundTagPtr Empty(std::u8string const &name, CompoundTag const &tagJ, Pos3i const &pos) {
