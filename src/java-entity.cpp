@@ -717,6 +717,10 @@ private:
 
     E(copper_golem, C(Mob, CopperGolem));
     E(sulfur_cube, C(Mob));
+    E(camel_husk, C(Mob));
+    E(nautilus, C(Mob));
+    E(parched, C(Mob));
+    E(zombie_nautilus, C(Mob));
 #undef A
 #undef M
 #undef E
