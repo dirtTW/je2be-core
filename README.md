@@ -20,6 +20,9 @@ Licensed **AGPL-3.0-or-later**. See `LICENSE`.
   - `{ id, properties }` (26.3),
   - a bare string entry,
   - a bare string palette list.
+- Chunks whose status is `minecraft:initialize_light` are converted when they contain
+  sections. 26.x leaves valid terrain and block entities there; skipping them lost most of
+  a trial-chamber area in the local audit.
 - Unknown block ids are preserved by name instead of being blanked.
 - Unknown biome names no longer drop a whole 16×16×16 section; the section is kept and falls
   back to `plains`.
@@ -65,12 +68,20 @@ LCE save handling is present (`x2j`, `x2b`, `p2j`, `p2b` paths). Xbox 360 input 
   `Data.singleplayer_uuid` reference, because the Java output is now 26.3.
 - Entities, block entities, maps, POI, and structures have converters, but coverage is not
   complete; round-trip tests compare the fixtures under `test/data/`.
+- Legacy Java entity names are normalized on output (`minecart_chest` → `chest_minecart`,
+  `falling_sand` → `falling_block`, and the furnace/hopper/TNT/rideable/command-block
+  minecarts).
+- The local 26.3 audit now matches source and Bedrock block entities by coordinate, except
+  for one chest that is represented as the other half of a double chest. Sulfur cube body
+  equipment, blank sign sides, `potent_sulfur`, world icon, and `levelname.txt` are covered.
 
 ### Dependency fork
 
 `libminecraft-file` is pinned to
 [dirtTW/libminecraft-file@f45bcee](https://github.com/dirtTW/libminecraft-file/commit/f45bceeac56827fc3d0799a24453e726a8c961f2),
-a fork of kbinani's header-only library. The fork carries:
+a fork of kbinani's header-only library. See that fork's
+[README](https://github.com/dirtTW/libminecraft-file#readme) for its current state and
+limitations. The fork carries:
 
 - 26.1/26.3 chunk palette reading (`id`/`properties` and string palettes),
 - unknown-biome fallback and the Bedrock biome IDs above,
