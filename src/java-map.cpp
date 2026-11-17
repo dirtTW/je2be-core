@@ -68,6 +68,11 @@ public:
     if (!xCenter || !zCenter || !colors) {
       return JE2BE_ERROR;
     }
+    auto const &colorBytes = colors->value();
+    if (colorBytes.size() != 16384) {
+      // A malformed map should not abort the whole world conversion.
+      return Status::Ok();
+    }
 
     for (u8 beScale = 0; beScale <= 4; beScale++) {
       i64 uuid = UUID(javaMapId, beScale);
@@ -95,7 +100,7 @@ public:
       if (beScale == scale) {
         int i = 0;
         int j = 0;
-        vector<u8> const &colorsArray = colors->value();
+        vector<u8> const &colorsArray = colorBytes;
         for (int y = 0; y < 128; y++) {
           for (int x = 0; x < 128; x++, i++) {
             u8 colorId = colorsArray[i];

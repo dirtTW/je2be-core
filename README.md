@@ -62,8 +62,9 @@ LCE save handling is present (`x2j`, `x2b`, `p2j`, `p2b` paths). Xbox 360 input 
 
 ### Player data and entities
 
-- Java → Bedrock: local player data is written to the Bedrock `LocalPlayer` key, including
-  root vehicle and shoulder riders.
+- Java → Bedrock: the local player is resolved through 26.1+'s `singleplayer_uuid` (falling
+  back to the newest `players/data/*.dat` for older or server worlds), then written to the
+  Bedrock `LocalPlayer` key, including root vehicle and shoulder riders.
 - Bedrock → Java: the local player is written to `players/data/<uuid>.dat` with a
   `Data.singleplayer_uuid` reference, because the Java output is now 26.3.
 - Entities, block entities, maps, POI, and structures have converters, but coverage is not
