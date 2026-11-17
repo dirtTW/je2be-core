@@ -30,6 +30,7 @@ static void CheckLevelDatB(fs::path const &expected, fs::path const &actual) {
       u8"serverChunkTickRange",
       u8"worldStartCount",
       u8"InventoryVersion",
+      u8"MinimumCompatibleClientVersion",
       u8"NetworkVersion",
       u8"showdaysplayed",
       u8"BiomeOverride",

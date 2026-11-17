@@ -34,17 +34,20 @@ Licensed **AGPL-3.0-or-later**. See `LICENSE`.
     block state).
   - local player in `players/data/<uuid>.dat`, referenced by `Data.singleplayer_uuid`.
   - maps in `data/minecraft/maps/<id>.dat`, with `last_id.dat`.
-- Unknown blocks still convert by name, so blocks newer than the Bedrock output target may
-  not render until the Bedrock tables catch up.
+- Unknown blocks still convert by name, so blocks newer than the Bedrock 1.26.63 palette
+  may not render until the Bedrock tables catch up.
 
 ### Bedrock Edition output
 
-- Writes **Bedrock 1.21.120**:
+- Writes **Bedrock 1.26.63**:
   - `StorageVersion = 10`
-  - `NetworkVersion = 859`
-  - `InventoryVersion = "1.21.120"`
-  - block state version `18168865`
-- Newer Bedrock clients upgrade a 1.21.120 world on load.
+  - `NetworkVersion = 2225`
+  - `InventoryVersion = "1.26.63"`
+  - `MinimumCompatibleClientVersion` and `lastOpenedWithVersion` = `[1, 26, 63, 0, 0]`
+  - block-state revision `18168865` (1.21.60.33, still current in 26.63)
+  - subchunk block-storage version `9`, chunk version `42`
+- 26.63 is the latest Bedrock release. Older clients cannot open this world; use the
+  1.21.120 build of the converter for those clients.
 - Bedrock biome IDs for the 26.x Java biomes are current:
   - `sulfur_caves` → **194** (Bedrock 26.30+)
   - `dappled_forest` → **195** (Bedrock 26.50+)
@@ -94,23 +97,19 @@ out this fork and builds `core.js` + `core.worker.js` from it.
 
 ## TODO
 
-1. **Write the latest Bedrock Edition** (26.60 / 26.63):
-   - Update `StorageVersion`, `NetworkVersion`, `InventoryVersion`, `lastOpenedWithVersion`,
-     `MinimumCompatibleClientVersion`, and the Bedrock block-state/chunk versions.
-   - Use the latest Bedrock block palettes (`R26_60`, and 26.63 if it changes the format) so
-     new blocks convert to real Bedrock identifiers instead of names that 1.21.120 lacks.
+1. **Block/item coverage**:
+   - The 120 Java 26.3 blocks now have ids, Bedrock mappings, and heightmap entries. Bedrock
+     sign and flower-pot variants go through the existing helpers: `poplar_sign` →
+     `poplar_standing_sign`, and the potted plants → `flower_pot`.
+   - Item-only additions (boats, etc.) still convert by name.
    - Add Bedrock 26.x biome IDs beyond 194/195 (e.g. `ice_caves` when it leaves preview).
-2. **Block/item coverage**:
-   - The 120 Java 26.3 blocks now have ids and heightmap entries in the dependency fork.
-     Item-only additions (boats, etc.) still convert by name; add them when the Bedrock
-     output target is raised.
-3. **Player and entity completeness**:
+2. **Player and entity completeness**:
    - Convert more than one Java player file; define behaviour for multiplayer/server worlds.
    - Audit entity, block-entity, and structure round-trips against 26.x fixtures.
-4. **Tests and fixtures**:
-   - Add a 26.3 Java world fixture and a Bedrock 26.60/26.63 fixture.
+3. **Tests and fixtures**:
+   - Add a 26.3 Java world fixture and a Bedrock 26.63 fixture.
    - Keep the native test suite green and add the same checks to the WASM build.
-   - Validate generated worlds with a dedicated 26.x client or server, not only with this
+   - Validate generated worlds with a dedicated 26.63 client or server, not only with this
      library's reader.
 
 ## References

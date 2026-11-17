@@ -48,3 +48,4 @@ static fs::path ProjectRootDir() {
 #include "parallel.test.hpp"
 #include "java-chunk-section.test.hpp"
 #include "blocks-26.3.test.hpp"
+#include "bedrock-26.63.test.hpp"
