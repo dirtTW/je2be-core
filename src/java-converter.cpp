@@ -76,6 +76,27 @@ public:
       }
     }
 
+    // Java 26.1+ moved weather out of level.dat.
+    fs::path weatherPath = input / "data" / "minecraft" / "weather.dat";
+    if (fs::is_regular_file(weatherPath)) {
+      auto stream = make_shared<mcfile::stream::GzFileInputStream>(weatherPath);
+      auto root = mcfile::nbt::CompoundTag::Read(stream, mcfile::Encoding::Java);
+      if (root) {
+        auto weather = root->compoundTag(u8"data");
+        if (weather) {
+          level.fRainLevel = weather->boolean(u8"raining", false) ? 1 : 0;
+          level.fRainTime = weather->int32(u8"rain_time", level.fRainTime);
+          level.fLightningLevel = weather->boolean(u8"thundering", false) ? 1 : 0;
+          level.fLightningTime = weather->int32(u8"thunder_time", level.fLightningTime);
+          auto clear = weather->int32(u8"clear_weather_time", 0);
+          if (clear > 0) {
+            level.fRainTime = clear;
+            level.fLightningTime = clear;
+          }
+        }
+      }
+    }
+
     bool ok = Datapacks::Import(input, output);
 
     auto levelData = std::make_unique<LevelData>(input, o, level.fCurrentTick, level.fDifficulty, level.fCommandsEnabled, level.fGameType, level.fDataVersion);
