@@ -91,6 +91,9 @@ cmake --build build-native --config Release
 The CLI examples are `example/j2b.cpp`, `b2j.cpp`, `x2j.cpp`, and `p2j.cpp`. The doctest suite
 is `je2be-test`; the round-trip tests are `test/j2b2j.cpp` and the fixtures in `test/data/`.
 
+The suite also checks all 120 Java 26.3 blocks at their default states against the Bedrock
+26.63 names, and a real 26.3 world was converted and inspected locally.
+
 WASM / browser payload is built through [je2be-web](https://github.com/kbinani/je2be-web);
 see that repository's `build-wasm` workflow. The DBOP site's GitHub Actions workflow checks
 out this fork and builds `core.js` + `core.worker.js` from it.

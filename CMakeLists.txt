@@ -432,6 +432,7 @@ set(test_files
   test/moving-piston.test.hpp
   test/blocks-26.3.test.hpp
   test/bedrock-26.63.test.hpp
+  test/blocks-26.3-bedrock.test.hpp
   test/command.test.hpp
   test/research.hpp
   test/block-data.test.hpp

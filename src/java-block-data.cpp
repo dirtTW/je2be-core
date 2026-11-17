@@ -1441,6 +1441,7 @@ public:
     E(bamboo_wall_sign, WallSign(u8"bamboo"));
 
     Converter bed(Name(u8"bed"), DirectionFromFacingA, PartToHeadPieceBit, OccupiedToOccupiedBit);
+    Converter strawBed(Name(u8"straw_bed"), CardinalDirectionFromFacing4, PartToHeadPieceBit, OccupiedToOccupiedBit);
     E(white_bed, bed);
     E(orange_bed, bed);
     E(magenta_bed, bed);
@@ -2116,7 +2117,7 @@ public:
     E(polished_sulfur_slab, Slab(u8"polished_sulfur_double_slab"));
     E(polished_sulfur_stairs, Stairs());
     E(polished_sulfur_wall, wall);
-    E(sulfur_spike, PointedDripstone);
+    E(sulfur_spike, SulfurSpike);
 
     E(poplar_planks, Identity);
     E(poplar_log, axisToPillarAxis);
@@ -2146,7 +2147,7 @@ public:
     E(potted_golden_dandelion, pottedFlowerPot);
     E(red_shrub, Identity);
     E(shelf_mushroom, Identity);
-    E(straw_bed, bed);
+    E(straw_bed, strawBed);
 
 #undef E
 
@@ -2606,6 +2607,19 @@ public:
 
   static CompoundTagPtr PointedDripstone(Block const &b, CompoundTagConstPtr const &, Options const &o) {
     auto c = New(u8"pointed_dripstone");
+    auto s = States();
+    auto thickness = b.property(u8"thickness", u8"tip");
+    if (thickness == u8"tip_merge") {
+      thickness = u8"merge";
+    }
+    auto direction = b.property(u8"vertical_direction", u8"down");
+    s->set(u8"dripstone_thickness", std::u8string(thickness));
+    s->set(u8"hanging", Bool(direction == u8"down"));
+    return AttachStates(c, s);
+  }
+
+  static CompoundTagPtr SulfurSpike(Block const &b, CompoundTagConstPtr const &, Options const &o) {
+    auto c = New(u8"sulfur_spike");
     auto s = States();
     auto thickness = b.property(u8"thickness", u8"tip");
     if (thickness == u8"tip_merge") {
