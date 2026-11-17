@@ -2144,6 +2144,7 @@ private:
   }
 
   static void Cushion(CompoundTag &c, CompoundTag const &tag, ConverterContext &) {
+    AddDefinition(c, u8"+minecraft:cushion");
     static std::u8string_view const colors[] = {
         u8"white", u8"orange", u8"magenta", u8"light_blue", u8"yellow", u8"lime",
         u8"pink", u8"gray", u8"light_gray", u8"cyan", u8"purple", u8"blue",
