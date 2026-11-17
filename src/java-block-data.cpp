@@ -352,7 +352,7 @@ public:
   }
 
   static void StairsDirectionFromFacing(CompoundTagPtr const &s, Block const &block, Options const &o) {
-    auto facing = block.property(u8"facing", u8"east");
+    auto facing = block.property(u8"facing", o.fItem ? u8"east" : u8"north");
     i32 direction = 0;
     if (facing == u8"east") {
       direction = 0;
@@ -393,13 +393,18 @@ public:
   // static Converter Planks(std::u8string const &type) { return Subtype(u8"planks", u8"wood_type", type); }
 
   static PropertyType FacingA(Block const &block) {
-    auto facing = block.property(u8"facing");
+    auto facing = block.property(u8"facing", u8"north");
     Facing4 f4 = Facing4FromJavaName(facing);
     return Int(BedrockDirectionFromFacing4(f4));
   }
+  static PropertyType FacingAByItem(Block const &block, Options const &o) {
+    auto facing = block.property(u8"facing", o.fItem ? u8"south" : u8"north");
+    return Int(BedrockDirectionFromFacing4(Facing4FromJavaName(facing)));
+  }
 
-  static PropertyType FacingB(Block const &block) {
-    auto facing = block.property(u8"facing");
+
+  static PropertyType FacingB(Block const &block, Options const &o) {
+    auto facing = block.property(u8"facing", o.fItem ? u8"east" : u8"north");
     i32 direction = 0;
     if (facing == u8"south") {
       direction = 2;
@@ -448,7 +453,7 @@ public:
       s->set(u8"direction", Int(0));
       return;
     }
-    auto f4 = Facing4FromJavaName(block.property(u8"facing"));
+    auto f4 = Facing4FromJavaName(block.property(u8"facing", o.fItem ? u8"south" : u8"north"));
     i32 direction = 0;
     switch (f4) {
     case Facing4::North:
@@ -468,16 +473,16 @@ public:
   }
 
   static void DirectionNorth2East3South0West1FromFacing(CompoundTagPtr const &s, Block const &block, Options const &o) {
-    auto f4 = Facing4FromJavaName(block.property(u8"facing"));
+    auto f4 = Facing4FromJavaName(block.property(u8"facing", o.fItem ? u8"south" : u8"north"));
     s->set(u8"direction", Int(North2East3South0West1FromFacing4(f4)));
   }
 
   static void DirectionFromFacingA(CompoundTagPtr const &s, Block const &block, Options const &o) {
-    s->set(u8"direction", FacingA(block));
+    s->set(u8"direction", FacingAByItem(block, o));
   }
 
   static void CardinalDirectionFromFacing4(CompoundTagPtr const &s, Block const &block, Options const &o) {
-    s->set(u8"minecraft:cardinal_direction", std::u8string(block.property(u8"facing", u8"south")));
+    s->set(u8"minecraft:cardinal_direction", std::u8string(block.property(u8"facing", o.fItem ? u8"south" : u8"north")));
   }
 
   static PropertyPickupFunction CardinalDirectionFromFacing4ByItemDefault(Facing4 f4) {
@@ -491,7 +496,7 @@ public:
   }
 
   static void DirectionFromFacingB(CompoundTagPtr const &s, Block const &block, Options const &o) {
-    s->set(u8"direction", FacingB(block));
+    s->set(u8"direction", FacingB(block, o));
   }
 
   static void DirectionFromFacingC(CompoundTagPtr const &s, Block const &block, Options const &o) {
@@ -1680,7 +1685,7 @@ public:
     E(void_air, Rename(u8"air"));
     E(turtle_egg, Converter(Same, TurtleEggCount, TurtleEggCrackedState));
 
-    Converter beehive(Same, Name(FacingA, u8"direction"), HoneyLevel);
+    Converter beehive(Same, DirectionFromFacingA, HoneyLevel);
     E(bee_nest, beehive);
     E(beehive, beehive);
 

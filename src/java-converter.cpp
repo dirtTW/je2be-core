@@ -61,6 +61,21 @@ public:
     }
     Level level = Level::ImportFromJava(*data);
 
+    // Java 26.1+ moved world generation settings out of level.dat.
+    fs::path worldGenSettingsPath = input / "data" / "minecraft" / "world_gen_settings.dat";
+    if (fs::is_regular_file(worldGenSettingsPath)) {
+      auto stream = make_shared<mcfile::stream::GzFileInputStream>(worldGenSettingsPath);
+      auto root = mcfile::nbt::CompoundTag::Read(stream, mcfile::Encoding::Java);
+      if (root) {
+        auto settings = root->compoundTag(u8"data");
+        if (settings) {
+          if (auto seed = settings->int64(u8"seed")) {
+            level.fRandomSeed = *seed;
+          }
+        }
+      }
+    }
+
     bool ok = Datapacks::Import(input, output);
 
     auto levelData = std::make_unique<LevelData>(input, o, level.fCurrentTick, level.fDifficulty, level.fCommandsEnabled, level.fGameType, level.fDataVersion);
