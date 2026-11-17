@@ -9,6 +9,20 @@ TEST_CASE("Bedrock 26.63 output constants") {
     CHECK(je2be::java::kBlockDataVersion == 18168865);
 }
 
+TEST_CASE("default spike properties") {
+    je2be::DataVersion dataVersion(5023, 5023);
+    for (char8_t const *name : {u8"minecraft:sulfur_spike", u8"minecraft:pointed_dripstone"}) {
+        auto java = mcfile::je::Block::FromNameAndProperties(name, 5023, {});
+        auto be = je2be::java::BlockData::From(java, nullptr, dataVersion, {});
+        REQUIRE(be);
+        auto states = be->compoundTag(u8"states");
+        REQUIRE(states);
+        INFO(std::string(name, name + std::char_traits<char8_t>::length(name)));
+        CHECK_FALSE(states->boolean(u8"hanging", true));
+        CHECK(states->string(u8"dripstone_thickness", u8"") == u8"tip");
+    }
+}
+
 TEST_CASE("sulfur spike ground state") {
     je2be::DataVersion dataVersion(5023, 5023);
     std::map<std::u8string, std::u8string> props{{u8"thickness", u8"tip"}, {u8"vertical_direction", u8"up"}, {u8"waterlogged", u8"false"}};

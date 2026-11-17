@@ -2612,7 +2612,7 @@ public:
     if (thickness == u8"tip_merge") {
       thickness = u8"merge";
     }
-    auto direction = b.property(u8"vertical_direction", u8"down");
+    auto direction = b.property(u8"vertical_direction", u8"up");
     s->set(u8"dripstone_thickness", std::u8string(thickness));
     s->set(u8"hanging", Bool(direction == u8"down"));
     return AttachStates(c, s);
@@ -2625,7 +2625,7 @@ public:
     if (thickness == u8"tip_merge") {
       thickness = u8"merge";
     }
-    auto direction = b.property(u8"vertical_direction", u8"down");
+    auto direction = b.property(u8"vertical_direction", u8"up");
     s->set(u8"dripstone_thickness", std::u8string(thickness));
     s->set(u8"hanging", Bool(direction == u8"down"));
     return AttachStates(c, s);
