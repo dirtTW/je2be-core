@@ -9,6 +9,18 @@ TEST_CASE("Bedrock 26.63 output constants") {
     CHECK(je2be::java::kBlockDataVersion == 18168865);
 }
 
+TEST_CASE("sulfur spike ground state") {
+    je2be::DataVersion dataVersion(5023, 5023);
+    std::map<std::u8string, std::u8string> props{{u8"thickness", u8"tip"}, {u8"vertical_direction", u8"up"}, {u8"waterlogged", u8"false"}};
+    auto java = mcfile::je::Block::FromNameAndProperties(u8"minecraft:sulfur_spike", 5023, props);
+    auto be = je2be::java::BlockData::From(java, nullptr, dataVersion, {});
+    REQUIRE(be);
+    auto states = be->compoundTag(u8"states");
+    REQUIRE(states);
+    CHECK_FALSE(states->boolean(u8"hanging", true));
+    CHECK(states->string(u8"dripstone_thickness", u8"") == u8"tip");
+}
+
 TEST_CASE("26.3 blocks map to Bedrock names") {
     je2be::DataVersion dataVersion(5023, 5023);
 
