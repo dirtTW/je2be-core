@@ -81,6 +81,22 @@ public:
     }
     return found->second.fColor;
   }
+
+  static std::optional<std::u8string> JavaItemIdFromBedrockDamage(i16 damage) {
+    switch (damage) {
+    // 3-14 stay as filled_map + components for round-trip compatibility with
+    // worlds that predate the distinct 26.3 map item ids.
+    case 23: return u8"minecraft:buried_ancient_city_map";
+    case 24: return u8"minecraft:buried_mineshaft_map";
+    case 25: return u8"minecraft:desert_pyramid_map";
+    case 26: return u8"minecraft:warm_ocean_ruins_map";
+    default:
+      if (15 <= damage && damage <= 22) {
+        return u8"minecraft:abandoned_camp_map";
+      }
+      return std::nullopt;
+    }
+  }
 };
 
 } // namespace je2be

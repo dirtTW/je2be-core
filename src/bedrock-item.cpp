@@ -913,6 +913,9 @@ public:
       }
     }
 
+    if (auto itemId = MapType::JavaItemIdFromBedrockDamage(damage); itemId) {
+      return *itemId;
+    }
     return name;
   }
 
