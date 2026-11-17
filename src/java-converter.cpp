@@ -28,6 +28,8 @@
 #include "java/_world-data.hpp"
 #include "java/_world.hpp"
 
+#include "_world-icon.hpp"
+
 namespace je2be::java {
 
 class Converter::Impl {
@@ -59,6 +61,95 @@ public:
     if (!data) {
       return JE2BE_ERROR;
     }
+    // Java 26.3 stores game rules and difficulty outside Level.Data.GameRules.
+    if (auto dataTag = data->compoundTag(u8"Data"); dataTag) {
+      if (auto difficultySettings = dataTag->compoundTag(u8"difficulty_settings"); difficultySettings) {
+        if (auto difficulty = difficultySettings->string(u8"difficulty"); difficulty) {
+          int value = 2;
+          if (*difficulty == u8"peaceful") {
+            value = 0;
+          } else if (*difficulty == u8"easy") {
+            value = 1;
+          } else if (*difficulty == u8"hard") {
+            value = 3;
+          }
+          dataTag->set(u8"Difficulty", make_shared<mcfile::nbt::ByteTag>((int8_t)value));
+        }
+      }
+      fs::path gameRulesPath = input / "data" / "minecraft" / "game_rules.dat";
+      if (fs::is_regular_file(gameRulesPath)) {
+        auto stream = make_shared<mcfile::stream::GzFileInputStream>(gameRulesPath);
+        auto root = mcfile::nbt::CompoundTag::Read(stream, mcfile::Encoding::Java);
+        if (root) {
+          if (auto rules = root->compoundTag(u8"data"); rules) {
+            static std::unordered_map<std::u8string, std::u8string> const names = {
+                {u8"minecraft:command_block_output", u8"commandBlockOutput"},
+                {u8"minecraft:command_blocks_work", u8"commandBlocksEnabled"},
+                {u8"minecraft:advance_time", u8"doDaylightCycle"},
+                {u8"minecraft:advance_weather", u8"doWeatherCycle"},
+                {u8"minecraft:block_drops", u8"doTileDrops"},
+                {u8"minecraft:entity_drops", u8"doEntityDrops"},
+                {u8"minecraft:mob_drops", u8"doMobLoot"},
+                {u8"minecraft:spawn_mobs", u8"doMobSpawning"},
+                {u8"minecraft:immediate_respawn", u8"doImmediateRespawn"},
+                {u8"minecraft:spawn_phantoms", u8"doInsomnia"},
+                {u8"minecraft:limited_crafting", u8"doLimitedCrafting"},
+                {u8"minecraft:fire_damage", u8"fireDamage"},
+                {u8"minecraft:fall_damage", u8"fallDamage"},
+                {u8"minecraft:drowning_damage", u8"drowningDamage"},
+                {u8"minecraft:freeze_damage", u8"freezeDamage"},
+                {u8"minecraft:keep_inventory", u8"keepInventory"},
+                {u8"minecraft:locator_bar", u8"locatorBar"},
+                {u8"minecraft:max_command_sequence_length", u8"maxCommandChainLength"},
+                {u8"minecraft:mob_griefing", u8"mobGriefing"},
+                {u8"minecraft:natural_health_regeneration", u8"naturalRegeneration"},
+                {u8"minecraft:random_tick_speed", u8"randomTickSpeed"},
+                {u8"minecraft:send_command_feedback", u8"sendCommandFeedback"},
+                {u8"minecraft:show_death_messages", u8"showDeathMessages"},
+                {u8"minecraft:respawn_radius", u8"spawnRadius"},
+                {u8"minecraft:players_sleeping_percentage", u8"playersSleepingPercentage"},
+                {u8"minecraft:projectiles_can_break_blocks", u8"projectilesCanBreakBlocks"},
+                {u8"minecraft:pvp", u8"pvp"},
+                {u8"minecraft:tnt_explodes", u8"tntExplodes"},
+                {u8"minecraft:tnt_explosion_drop_decay", u8"tntexplosiondropdecay"},
+                {u8"minecraft:reduced_debug_info", u8"reducedDebugInfo"},
+            };
+            auto legacyGameRules = make_shared<mcfile::nbt::CompoundTag>();
+            for (auto const &it : *rules) {
+              auto found = names.find(it.first);
+              if (found == names.end()) {
+                continue;
+              }
+              std::u8string value;
+              switch (it.second->type()) {
+              case mcfile::nbt::Tag::Type::Byte:
+                if (auto b = dynamic_pointer_cast<mcfile::nbt::ByteTag>(it.second); b) {
+                  value = b->fValue ? u8"true" : u8"false";
+                }
+                break;
+              case mcfile::nbt::Tag::Type::Int:
+                if (auto i = dynamic_pointer_cast<mcfile::nbt::IntTag>(it.second); i) {
+                  value = mcfile::String::ToString(i->fValue);
+                }
+                break;
+              case mcfile::nbt::Tag::Type::Long:
+                if (auto i = dynamic_pointer_cast<mcfile::nbt::LongTag>(it.second); i) {
+                  value = mcfile::String::ToString(i->fValue);
+                }
+                break;
+              default:
+                break;
+              }
+              if (!value.empty()) {
+                legacyGameRules->set(found->second, make_shared<mcfile::nbt::StringTag>(value));
+              }
+            }
+            dataTag->set(u8"GameRules", legacyGameRules);
+          }
+        }
+      }
+    }
+
     Level level = Level::ImportFromJava(*data);
 
     // Java 26.1+ moved world generation settings out of level.dat.
@@ -229,6 +320,9 @@ public:
       }
       level.fCheatsEnabled = levelData->fAllowCommand;
       ok = level.write(output / "level.dat");
+      if (ok) {
+        ConvertWorldIcon(input, output);
+      }
       if (ok) {
         if (auto st = levelData->put(db, *data, levelData->fUuids); !st.ok()) {
           return JE2BE_ERROR_PUSH(st);

@@ -217,6 +217,7 @@ set(je2be_src_files
   src/_static-reversible-map.hpp
   src/_system.hpp
   src/_version.hpp
+  src/_world-icon.hpp
   src/_volume.hpp
   src/_walk.hpp
   src/bedrock-block-data.cpp
@@ -315,6 +316,7 @@ set(je2be_src_files
   src/java-region.cpp
   src/java-sub-chunk.cpp
   src/java-tile-entity.cpp
+  src/icon.cpp
   src/java-world.cpp
   src/java/_axolotl.hpp
   src/java/_biome-map-legacy.hpp
