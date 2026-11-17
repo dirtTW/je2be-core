@@ -2,14 +2,13 @@ diff --git a/include/mcfile/be/biome.hpp b/include/mcfile/be/biome.hpp
 index 771d5ad..914e42f 100644
 --- a/include/mcfile/be/biome.hpp
 +++ b/include/mcfile/be/biome.hpp
-@@ -198,6 +198,10 @@ public:
+@@ -198,6 +198,9 @@ public:
          case mangrove_swamp: return 191;
          case cherry_grove: return 192;
          case pale_garden: return 193;
-+        // 26.2: Bedrock has no sulfur caves; dripstone_caves is the nearest cave biome.
-+        case sulfur_caves: return 188;
-+        // 26.3: Bedrock has no dappled forest; the generic forest is the nearest match.
-+        case dappled_forest: return 4;
++        // Bedrock 26.30 added sulfur caves (194); 26.50 added dappled forest (195).
++        case sulfur_caves: return 194;
++        case dappled_forest: return 195;
          default:
              return 0;
          }

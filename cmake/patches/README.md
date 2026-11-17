@@ -32,8 +32,8 @@ without it. Three separate things break:
 
 3. **The biomes themselves.** `sulfur_caves` and `dappled_forest` are added to the biome
    enum, the name tables, and the Bedrock mapping. Bedrock has neither biome, so
-   `mcfile::be::Biome::ToUint32` maps `sulfur_caves` to `dripstone_caves` (188) and
-   `dappled_forest` to `forest` (4) — the nearest existing Bedrock biomes.
+   `mcfile::be::Biome::ToUint32` maps `sulfur_caves` to 194 and `dappled_forest` to
+   195, their numeric IDs in Bedrock 26.30 and 26.50.
 
 ### Not covered
 
