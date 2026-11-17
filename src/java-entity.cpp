@@ -677,6 +677,14 @@ private:
     E(axolotl, C(Animal, AgeableA(u8"axolotl"), PersistentFromFromBucket, Axolotl));
     E(goat, C(Animal, AgeableA(u8"goat"), Goat));
     E(falling_block, C(EntityBase, FallingBlock));
+    // Pre-1.13 Java entity names in old worlds.
+    E(minecart_chest, C(EntityBase, ChestItemsFromItems, Minecart, Rename(u8"chest_minecart"), ChestMinecart));
+    E(minecart_hopper, C(EntityBase, ChestItemsFromItems, Minecart, Rename(u8"hopper_minecart"), HopperMinecart));
+    E(minecart_t_n_t, C(EntityBase, Vehicle(), Minecart, Rename(u8"tnt_minecart"), TntMinecart));
+    E(minecart_rideable, C(EntityBase, Vehicle(), Minecart, Rename(u8"minecart")));
+    E(minecart_furnace, C(EntityBase, Vehicle(), Minecart, Rename(u8"furnace_minecart")));
+    E(minecart_command_block, C(EntityBase, Vehicle(), Minecart, Rename(u8"command_block_minecart")));
+    E(falling_sand, C(EntityBase, Rename(u8"falling_block"), FallingBlock));
     E(wither, C(Mob, Definitions({u8"+minecraft:wither"}), Wither));
     E(arrow, C(EntityBase, Definitions({u8"+minecraft:arrow"}), Arrow));
 
