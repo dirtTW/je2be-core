@@ -1932,7 +1932,7 @@ private:
     ret->set(u8"IgnoreLighting", Bool(false));
     ret->set(u8"PersistFormatting", Bool(true));
     ret->set(u8"SignTextColor", Int(-16777216));
-    ret->set(u8"Text", u8"back");
+    ret->set(u8"Text", u8"");
     ret->set(u8"TextOwner", u8"");
     return ret;
   }
@@ -1950,11 +1950,16 @@ private:
         if (!line) {
           continue;
         }
+        u8string lineText;
         if (auto c = line->asCompound(); c) {
-          text += c->string(u8"text", u8"");
+          lineText = c->string(u8"text", u8"");
         } else if (auto s = line->asString(); s) {
-          text += props::GetTextComponent(strings::Unquote(s->fValue));
+          lineText = props::GetTextComponent(strings::Unquote(s->fValue));
         }
+        if (lineText == u8"null") {
+          lineText.clear();
+        }
+        text += lineText;
       }
     }
     while (true) {
