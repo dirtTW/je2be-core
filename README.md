@@ -75,6 +75,9 @@ LCE save handling is present (`x2j`, `x2b`, `p2j`, `p2b` paths). Xbox 360 input 
 - The local 26.3 audit now matches source and Bedrock block entities by coordinate, except
   for one chest that is represented as the other half of a double chest. Sulfur cube body
   equipment, blank sign sides, `potent_sulfur`, world icon, and `levelname.txt` are covered.
+- 26.3 explorer-map item ids (`buried_treasure_map`, `ocean_monument_map`, and the rest) are
+  converted to Bedrock `filled_map` damage types, and item frames set the Bedrock map bit for
+  any `*_map` item.
 
 ### Dependency fork
 

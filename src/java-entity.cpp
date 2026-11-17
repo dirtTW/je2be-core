@@ -133,7 +133,7 @@ public:
       auto itemIdString = itemId->asString();
       if (itemIdString) {
         u8string itemName = itemIdString->fValue;
-        if (itemName == u8"minecraft:filled_map") {
+        if (itemName == u8"minecraft:filled_map" || itemName.ends_with(u8"_map")) {
           map = true;
         }
       }

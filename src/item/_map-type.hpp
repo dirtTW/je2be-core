@@ -25,6 +25,13 @@ class MapType {
     (*ret)[9] = {u8"filled_map.village_plains", 10066329};
     (*ret)[7] = {u8"filled_map.village_snowy", 10066329};
     (*ret)[14] = {u8"filled_map.trial_chambers", 12741452};
+    for (i16 damage = 15; damage <= 22; damage++) {
+      (*ret)[damage] = {u8"filled_map.abandoned_camp", std::nullopt};
+    }
+    (*ret)[23] = {u8"filled_map.buried_ancient_city", std::nullopt};
+    (*ret)[24] = {u8"filled_map.buried_mineshaft", std::nullopt};
+    (*ret)[25] = {u8"filled_map.desert_pyramid", std::nullopt};
+    (*ret)[26] = {u8"filled_map.warm_ocean_ruins", std::nullopt};
     return ret;
   }
 

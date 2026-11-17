@@ -135,10 +135,13 @@ private:
       item->set(u8"Damage", Short(damage));
     }
 
-    if (name == u8"minecraft:filled_map") {
+    if (name == u8"minecraft:filled_map" || ExplorerMapDamage(name)) {
       auto ret = Map(name, *item, ctx.fMapInfo);
       if (ret) {
         auto [mapId, result] = *ret;
+        if (auto damage = ExplorerMapDamage(name); damage) {
+          result->set(u8"Damage", Short(*damage));
+        }
         ctx.fWorldData.addMap(mapId, item);
         return result;
       } else {
@@ -1765,8 +1768,34 @@ private:
     return name;
   }
 
+  static std::optional<i16> ExplorerMapDamage(std::u8string const &name) {
+    static std::unordered_map<std::u8string, i16> const table = {
+        {u8"minecraft:abandoned_camp_map", 15},
+        {u8"minecraft:buried_ancient_city_map", 23},
+        {u8"minecraft:buried_mineshaft_map", 24},
+        {u8"minecraft:buried_treasure_map", 5},
+        {u8"minecraft:buried_trial_chambers_map", 14},
+        {u8"minecraft:desert_pyramid_map", 25},
+        {u8"minecraft:desert_village_map", 11},
+        {u8"minecraft:jungle_pyramid_map", 12},
+        {u8"minecraft:ocean_monument_map", 3},
+        {u8"minecraft:plains_village_map", 9},
+        {u8"minecraft:savanna_village_map", 10},
+        {u8"minecraft:snowy_village_map", 7},
+        {u8"minecraft:swamp_hut_map", 13},
+        {u8"minecraft:taiga_village_map", 8},
+        {u8"minecraft:warm_ocean_ruins_map", 26},
+        {u8"minecraft:woodland_mansion_map", 4},
+    };
+    auto found = table.find(name);
+    if (found == table.end()) {
+      return std::nullopt;
+    }
+    return found->second;
+  }
+
   static std::optional<std::tuple<int, CompoundTagPtr>> Map(std::u8string const &name, CompoundTag const &item, JavaEditionMap const &mapInfo) {
-    auto ret = New(name, true);
+    auto ret = New(u8"minecraft:filled_map", true);
     ret->set(u8"Damage", Short(0));
 
     auto mapId = Migrate<IntTag>(item, u8"map_id", Depth::Tag, u8"map");
