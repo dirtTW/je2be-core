@@ -836,6 +836,8 @@ private:
     E(black_harness, DefaultItem);
     E(music_disc_tears, DefaultItem);
     E(music_disc_lava_chicken, DefaultItem);
+    E(music_disc_bounce, DefaultItem);
+    E(netherite_horse_armor, DefaultItem);
     E(blue_egg, DefaultItem);
     E(brown_egg, DefaultItem);
     E(happy_ghast_spawn_egg, DefaultItem);
