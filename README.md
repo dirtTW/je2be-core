@@ -63,18 +63,18 @@ LCE save handling is present (`x2j`, `x2b`, `p2j`, `p2b` paths). Xbox 360 input 
 - Entities, block entities, maps, POI, and structures have converters, but coverage is not
   complete; round-trip tests compare the fixtures under `test/data/`.
 
-### Dependency patch
+### Dependency fork
 
-`libminecraft-file` is pinned to `6f00d2c6` and patched by
-`cmake/patches/libminecraft-file-26.x.patch` because the upstream headers do not read the
-26.x chunk format yet. The patch covers:
+`libminecraft-file` is pinned to
+[dirtTW/libminecraft-file@f45bcee](https://github.com/dirtTW/libminecraft-file/commit/f45bceeac56827fc3d0799a24453e726a8c961f2),
+a fork of kbinani's header-only library. The fork carries:
 
-- 26.3 palette keys and palette shapes,
-- unknown biome fallback,
-- the numeric Bedrock IDs above.
-
-The patch also makes `Block::toCompoundTag` write `id`/`properties` when the target data
-version is 26.3 or newer, so Java 26.3 output uses the current palette shape.
+- 26.1/26.3 chunk palette reading (`id`/`properties` and string palettes),
+- unknown-biome fallback and the Bedrock biome IDs above,
+- the 120 Java 26.3 blocks in the id, name, from-name, and heightmap tables,
+- the legacy flattening fixes from upstream PR #3 (typos, petrified slabs, axis:none logs,
+  shrubs, and item renames),
+- `Block::toCompoundTag` writing `id`/`properties` for 26.3 output.
 
 ## Build
 
@@ -101,9 +101,9 @@ out this fork and builds `core.js` + `core.worker.js` from it.
      new blocks convert to real Bedrock identifiers instead of names that 1.21.120 lacks.
    - Add Bedrock 26.x biome IDs beyond 194/195 (e.g. `ice_caves` when it leaves preview).
 2. **Block/item coverage**:
-   - `libminecraft-file` has no ids for roughly the blocks and items added in 1.21.11–26.3.
-     They currently convert by name. Add ids and heightmap classification for the ones that
-     have a Bedrock counterpart.
+   - The 120 Java 26.3 blocks now have ids and heightmap entries in the dependency fork.
+     Item-only additions (boats, etc.) still convert by name; add them when the Bedrock
+     output target is raised.
 3. **Player and entity completeness**:
    - Convert more than one Java player file; define behaviour for multiplayer/server worlds.
    - Audit entity, block-entity, and structure round-trips against 26.x fixtures.

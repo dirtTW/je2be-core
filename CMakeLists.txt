@@ -43,17 +43,11 @@ endif()
 
 CPMAddPackage(
   NAME libminecraft-file
-  GITHUB_REPOSITORY kbinani/libminecraft-file
-  GIT_TAG 6f00d2c6c06b400424b5418193410bfbc0fe76bf
-  # libminecraft-file is header only, has no tags, and its master does not yet read the
-  # 26.x chunk format (see cmake/patches/README.md). Until that lands upstream, carry the
-  # fix as a patch. apply-patch.cmake is used rather than PATCHES because the patch step is
-  # re-run on every configure and must tolerate the patch already being in place.
-  PATCH_COMMAND
-    "${CMAKE_COMMAND}"
-    "-DPATCH_FILE=${CMAKE_CURRENT_LIST_DIR}/cmake/patches/libminecraft-file-26.x.patch"
-    "-DSOURCE_DIR=<SOURCE_DIR>"
-    -P "${CMAKE_CURRENT_LIST_DIR}/cmake/patches/apply-patch.cmake")
+  GITHUB_REPOSITORY dirtTW/libminecraft-file
+  GIT_TAG f45bceeac56827fc3d0799a24453e726a8c961f2
+  # Header-only and untagged. This fork carries the 26.x reader and the 26.3 block tables
+  # until they land upstream.
+)
 
 CPMAddPackage(
   NAME defer
@@ -436,6 +430,7 @@ set(je2be_src_files
 set(test_files
   test/main.cpp
   test/moving-piston.test.hpp
+  test/blocks-26.3.test.hpp
   test/command.test.hpp
   test/research.hpp
   test/block-data.test.hpp

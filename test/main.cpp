@@ -47,3 +47,4 @@ static fs::path ProjectRootDir() {
 #include "bedrock-legacy-block.test.hpp"
 #include "parallel.test.hpp"
 #include "java-chunk-section.test.hpp"
+#include "blocks-26.3.test.hpp"
