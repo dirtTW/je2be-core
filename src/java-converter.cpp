@@ -14,6 +14,7 @@
 #include <je2be/java/progress.hpp>
 
 #include <atomic>
+#include <fstream>
 
 #include "_directory-iterator.hpp"
 #include "_parallel.hpp"
@@ -320,6 +321,10 @@ public:
       }
       level.fCheatsEnabled = levelData->fAllowCommand;
       ok = level.write(output / "level.dat");
+      if (ok && !level.fLevelName.empty()) {
+        std::ofstream f(output / "levelname.txt", std::ios::binary);
+        f.write(reinterpret_cast<char const *>(level.fLevelName.data()), level.fLevelName.size());
+      }
       if (ok) {
         ConvertWorldIcon(input, output);
       }
