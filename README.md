@@ -114,6 +114,13 @@ out this fork and builds `core.js` + `core.worker.js` from it.
    - Keep the native test suite green and add the same checks to the WASM build.
    - Validate generated worlds with a dedicated 26.63 client or server, not only with this
      library's reader.
+4. **Future Minecraft versions** (planned, not implemented):
+   - Put Java/Bedrock version numbers and block-state revisions in one `data/versions.json`
+     and generate `_versions.hpp` / `_data-version.hpp` from it.
+   - Generate block, item, and entity/alias tables from the Java server `--reports` data and
+     the Bedrock/Chunker identifier tables, then check the generated headers in CI.
+   - Add a scheduled version-watch workflow that regenerates the tables, runs the suite, and
+     opens a PR with a changelog. Semantic mappings still need manual review.
 
 ## References
 

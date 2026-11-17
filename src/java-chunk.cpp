@@ -53,7 +53,14 @@ public:
       if (!chunk) {
         return r;
       }
-      if (chunk->status() != mcfile::je::Chunk::Status::FULL) {
+      bool full = chunk->status() == mcfile::je::Chunk::Status::FULL;
+      if (!full && !chunk->fSections.empty()) {
+        // 26.x leaves terrain and block entities in chunks whose light pass has
+        // not finished yet. They are still valid world data.
+        auto status = root->string(u8"Status");
+        full = status && *status == u8"minecraft:initialize_light";
+      }
+      if (!full) {
         return r;
       }
       if (chunk->getDataVersion() >= 2724 && entities) {
