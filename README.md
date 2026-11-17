@@ -136,6 +136,10 @@ out this fork and builds `core.js` + `core.worker.js` from it.
      the Bedrock/Chunker identifier tables, then check the generated headers in CI.
    - Add a scheduled version-watch workflow that regenerates the tables, runs the suite, and
      opens a PR with a changelog. Semantic mappings still need manual review.
+5. **Component corpus**: generate Java registry/component data from the official server
+   `--reports`, then use a Bedrock fixture harness (LeviLamina/BDS) to spawn each entity or
+   block, save it, and dump actor NBT. Diff the two sides into committed fixtures and use
+   them to drive aliases and tests. Do not ship decompiled Mojang code.
 
 ## References
 
