@@ -25,11 +25,17 @@ TEST_CASE("shoulder-riders") {
   optToJe.fChunkFilter.insert(Pos2i(0, 0));
   CHECK(je2be::bedrock::Converter::Run(be, je, optToJe, 1).ok());
 
-  auto level = je / "level.dat";
-  auto stream = make_shared<mcfile::stream::GzFileInputStream>(level);
-  auto dat = CompoundTag::Read(stream, Encoding::Java);
-  auto data = dat->compoundTag(u8"Data");
-  auto player = data->compoundTag(u8"Player");
+  auto playersDir = je / "players" / "data";
+  fs::path playerFile;
+  for (auto const &it : fs::directory_iterator(playersDir)) {
+    if (it.is_regular_file() && it.path().filename().string().ends_with(".dat")) {
+      playerFile = it.path();
+      break;
+    }
+  }
+  CHECK(!playerFile.empty());
+  auto stream = make_shared<mcfile::stream::GzFileInputStream>(playerFile);
+  auto player = CompoundTag::Read(stream, Encoding::Java);
   CHECK(player);
 
   CHECK(player->compoundTag(u8"ShoulderEntityLeft"));

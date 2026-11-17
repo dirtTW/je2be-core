@@ -141,7 +141,7 @@ static void CheckMovingPiston(fs::path const &java, fs::path const &bedrock, i8 
     auto output = BedrockToJava(*bedrockReferenceDir);
     REQUIRE(output);
 
-    mcfile::je::World actualWorld(*output);
+    mcfile::je::World actualWorld(*output / "dimensions" / "minecraft" / "overworld");
     mcfile::je::World expectedWorld(*javaReferenceDir);
 
     auto actual = actualWorld.chunkAt(0, 0);
@@ -163,7 +163,11 @@ static void CheckMovingPiston(fs::path const &java, fs::path const &bedrock, i8 
       } else {
         CHECK(actualTile != nullptr);
         if (actualTile) {
-          DiffCompoundTag(*expectedTile, *actualTile);
+          auto e = expectedTile->copy();
+          auto a = actualTile->copy();
+          NormalizeBlockStateFieldsJ(*e);
+          NormalizeBlockStateFieldsJ(*a);
+          DiffCompoundTag(*e, *a);
         }
       }
     }

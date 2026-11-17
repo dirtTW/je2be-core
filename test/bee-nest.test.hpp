@@ -15,7 +15,7 @@ TEST_CASE("bee-nest") {
 
     auto st = bedrock::Converter::Run(in, out, opt, thread::hardware_concurrency());
     CHECK(st.ok());
-    mcfile::je::World world(out);
+    mcfile::je::World world(out / "dimensions" / "minecraft" / "overworld");
     auto chunk = world.chunkAt(0, 0);
     REQUIRE(chunk);
     auto tile = chunk->tileEntityAt(2, -60, 2);

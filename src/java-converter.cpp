@@ -382,10 +382,9 @@ private:
       return nullptr;
     }
 
-    auto player = Compound();
     auto s = make_shared<GzFileInputStream>(newest);
-    InputStreamReader r(s);
-    if (!player->read(r)) {
+    auto player = CompoundTag::Read(s, mcfile::Encoding::Java);
+    if (!player) {
       return nullptr;
     }
     return player;

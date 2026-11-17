@@ -7,6 +7,7 @@
 #include "_props.hpp"
 #include "_queue2d.hpp"
 #include "_walk.hpp"
+#include "bedrock/_constants.hpp"
 #include "bedrock/_context.hpp"
 #include "bedrock/_level-data.hpp"
 #include "bedrock/_world.hpp"
@@ -161,6 +162,10 @@ public:
       }
     }
 
+    if (auto st = WriteJavaPlayer(levelDat, output); !st.ok()) {
+      return JE2BE_ERROR_PUSH(st);
+    }
+
     LevelData::UpdateDataPacksAndEnabledFeatures(*levelDat, *bin);
 
     if (!LevelData::Write(*levelDat, output / "level.dat")) {
@@ -171,6 +176,38 @@ public:
   }
 
 private:
+  static Status WriteJavaPlayer(CompoundTagPtr const &levelDat, fs::path const &output) {
+    using namespace std;
+    auto data = levelDat->compoundTag(u8"Data");
+    if (!data) {
+      return Status::Ok();
+    }
+    auto player = data->compoundTag(u8"Player");
+    if (!player) {
+      return Status::Ok();
+    }
+    Uuid uuid;
+    if (auto found = props::GetUuidWithFormatIntArray(*player, u8"UUID"); found) {
+      uuid = *found;
+    }
+    auto dir = JavaPlayersDataDirectory(output);
+    error_code ec;
+    fs::create_directories(dir, ec);
+    if (ec) {
+      return JE2BE_ERROR_WHAT(ec.message());
+    }
+    auto root = player->copy();
+    root->set(u8"DataVersion", Int(kJavaDataVersion));
+    auto path = dir / (uuid.toString() + u8".dat");
+    auto stream = make_shared<mcfile::stream::GzFileOutputStream>(path);
+    if (!CompoundTag::Write(*root, stream, mcfile::Encoding::Java)) {
+      return JE2BE_ERROR;
+    }
+    data->set(u8"singleplayer_uuid", uuid.toIntArrayTag());
+    data->erase(u8"Player");
+    return Status::Ok();
+  }
+
   static Status Terraform(
       map<mcfile::Dimension, vector<pair<Pos2i, Context::ChunksInRegion>>> const &regions,
       fs::path const &output,
@@ -268,19 +305,7 @@ private:
         int rx = region.fX;
         int rz = region.fZ;
 
-        fs::path directory;
-        switch (dim) {
-        case mcfile::Dimension::Nether:
-          directory = output / "DIM-1" / "region";
-          break;
-        case mcfile::Dimension::End:
-          directory = output / "DIM1" / "region";
-          break;
-        case mcfile::Dimension::Overworld:
-        default:
-          directory = output / "region";
-          break;
-        }
+        fs::path directory = JavaDimensionDirectory(output, dim) / "region";
 
         auto found = terrainTempDirs.find(dim);
         if (found == terrainTempDirs.end()) {

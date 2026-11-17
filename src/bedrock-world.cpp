@@ -5,6 +5,7 @@
 #include "_file.hpp"
 #include "_parallel.hpp"
 #include "_props.hpp"
+#include "bedrock/_constants.hpp"
 #include "bedrock/_region.hpp"
 
 using namespace std;
@@ -30,20 +31,7 @@ public:
     using namespace mcfile;
     namespace fs = std::filesystem;
 
-    fs::path dir;
-    switch (d) {
-    case Dimension::Overworld:
-      dir = root;
-      break;
-    case Dimension::Nether:
-      dir = root / "DIM-1";
-      break;
-    case Dimension::End:
-      dir = root / "DIM1";
-      break;
-    default:
-      return JE2BE_ERROR;
-    }
+    fs::path dir = JavaDimensionDirectory(root, d);
 
     error_code ec;
     fs::create_directories(dir / "region", ec);

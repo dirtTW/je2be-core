@@ -27,11 +27,15 @@ Licensed **AGPL-3.0-or-later**. See `LICENSE`.
 
 ### Java Edition output
 
-- Still writes **1.21.10 (`DataVersion = 4556`)**, the pre-26.1 directory layout
-  (`region/`, `DIM-1/`, `DIM1/`), and the pre-26.3 `Name`/`Properties` palette keys.
-- This is intentional for now: a world stamped with a newer `DataVersion` would make a 26.x
-  client look under `dimensions/minecraft/overworld` and show an empty world. Every newer
-  client upgrades a 1.21.10 world on load.
+- Writes **26.3 (`DataVersion = 5023`)**:
+  - 26.1 layout: `dimensions/minecraft/<dimension>/{region,entities,poi}` and
+    `data/minecraft/...`.
+  - 26.3 block palette keys: `id` / `properties` (properties are omitted for the default
+    block state).
+  - local player in `players/data/<uuid>.dat`, referenced by `Data.singleplayer_uuid`.
+  - maps in `data/minecraft/maps/<id>.dat`, with `last_id.dat`.
+- Unknown blocks still convert by name, so blocks newer than the Bedrock output target may
+  not render until the Bedrock tables catch up.
 
 ### Bedrock Edition output
 
@@ -54,7 +58,8 @@ LCE save handling is present (`x2j`, `x2b`, `p2j`, `p2b` paths). Xbox 360 input 
 
 - Java → Bedrock: local player data is written to the Bedrock `LocalPlayer` key, including
   root vehicle and shoulder riders.
-- Bedrock → Java: the local player is written to `level.dat` (`Data.Player` on 1.21.10).
+- Bedrock → Java: the local player is written to `players/data/<uuid>.dat` with a
+  `Data.singleplayer_uuid` reference, because the Java output is now 26.3.
 - Entities, block entities, maps, POI, and structures have converters, but coverage is not
   complete; round-trip tests compare the fixtures under `test/data/`.
 
@@ -68,8 +73,8 @@ LCE save handling is present (`x2j`, `x2b`, `p2j`, `p2b` paths). Xbox 360 input 
 - unknown biome fallback,
 - the numeric Bedrock IDs above.
 
-A second palette change (writing `id`/`properties` for 26.3 output) is **not** on `main` yet;
-it belongs to the Java 26.3 writer work below.
+The patch also makes `Block::toCompoundTag` write `id`/`properties` when the target data
+version is 26.3 or newer, so Java 26.3 output uses the current palette shape.
 
 ## Build
 
@@ -89,29 +94,20 @@ out this fork and builds `core.js` + `core.worker.js` from it.
 
 ## TODO
 
-1. **Write Java 26.3** (work in progress, not on `main`):
-   - 26.1 layout: `dimensions/minecraft/<dimension>/{region,entities,poi}`,
-     `data/minecraft/...`, `players/data/<uuid>.dat`.
-   - 26.3 palette keys: `id` / `properties`, omitting `properties` for default states.
-   - Split `level.dat` `Data.Player` into `players/data/<uuid>.dat` and write
-     `Data.singleplayer_uuid` (int array).
-   - Maps under `data/minecraft/maps/<id>.dat`; `last_id.dat`.
-   - Regenerate `j2b2j` / `b2j2b` expectations for the new layout and `DataVersion = 5023`.
-   - Add/repair round-trip tests for player data and falling blocks under the new layout.
-2. **Write the latest Bedrock Edition** (26.60 / 26.63):
+1. **Write the latest Bedrock Edition** (26.60 / 26.63):
    - Update `StorageVersion`, `NetworkVersion`, `InventoryVersion`, `lastOpenedWithVersion`,
      `MinimumCompatibleClientVersion`, and the Bedrock block-state/chunk versions.
    - Use the latest Bedrock block palettes (`R26_60`, and 26.63 if it changes the format) so
      new blocks convert to real Bedrock identifiers instead of names that 1.21.120 lacks.
    - Add Bedrock 26.x biome IDs beyond 194/195 (e.g. `ice_caves` when it leaves preview).
-3. **Block/item coverage**:
+2. **Block/item coverage**:
    - `libminecraft-file` has no ids for roughly the blocks and items added in 1.21.11–26.3.
      They currently convert by name. Add ids and heightmap classification for the ones that
      have a Bedrock counterpart.
-4. **Player and entity completeness**:
+3. **Player and entity completeness**:
    - Convert more than one Java player file; define behaviour for multiplayer/server worlds.
    - Audit entity, block-entity, and structure round-trips against 26.x fixtures.
-5. **Tests and fixtures**:
+4. **Tests and fixtures**:
    - Add a 26.3 Java world fixture and a Bedrock 26.60/26.63 fixture.
    - Keep the native test suite green and add the same checks to the WASM build.
    - Validate generated worlds with a dedicated 26.x client or server, not only with this

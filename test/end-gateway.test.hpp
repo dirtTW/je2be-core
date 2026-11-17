@@ -15,7 +15,7 @@ TEST_CASE("end-gateway") {
     opt.fChunkFilter.insert({-51, -39});
     auto st = bedrock::Converter::Run(in, out, opt, thread::hardware_concurrency());
     CHECK(st.ok());
-    mcfile::je::World world(out / "DIM1");
+    mcfile::je::World world(out / "dimensions" / "minecraft" / "the_end");
     {
       auto chunk = world.chunkAt(-5, -4);
       REQUIRE(chunk);

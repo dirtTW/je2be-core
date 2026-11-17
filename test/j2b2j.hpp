@@ -22,6 +22,8 @@ struct CheckEntityJOptions {
 
 static void CheckEntityJ(std::u8string const &id, CompoundTag const &entityE, CompoundTag const &entityA, CheckEntityJOptions options = {});
 
+static void NormalizeBlockStateFieldsJ(CompoundTag &tag);
+
 static void CheckBlockJWithIgnore(mcfile::je::Block const &e, mcfile::je::Block const &a, std::initializer_list<std::u8string> ignore) {
   CHECK(e.fName == a.fName);
   map<u8string, optional<u8string>> op;
@@ -435,6 +437,8 @@ static void CheckSignTextLinesJ(CompoundTag const &e, CompoundTag const &a) {
 static void CheckTileEntityJ(CompoundTag const &expected, CompoundTag const &actual) {
   auto copyE = expected.copy();
   auto copyA = actual.copy();
+  NormalizeBlockStateFieldsJ(*copyE);
+  NormalizeBlockStateFieldsJ(*copyA);
 
   auto x = expected.int32(u8"x");
   auto y = expected.int32(u8"y");
@@ -722,9 +726,30 @@ static void CheckUuidJ(CompoundTag const &e, CompoundTag const &a, std::u8string
   }
 }
 
+static void NormalizeBlockStateJ(CompoundTag &tag) {
+  if (auto id = tag.string(u8"id"); id) {
+    tag.set(u8"Name", *id);
+    tag.erase(u8"id");
+  }
+  if (auto props = tag.compoundTag(u8"properties"); props) {
+    tag.set(u8"Properties", props);
+    tag.erase(u8"properties");
+  }
+}
+
+static void NormalizeBlockStateFieldsJ(CompoundTag &tag) {
+  for (auto const &key : {u8"carriedBlockState", u8"BlockState", u8"FallingBlock", u8"PlantBlock", u8"blockState"}) {
+    if (auto c = tag.compoundTag(key); c) {
+      NormalizeBlockStateJ(*c);
+    }
+  }
+}
+
 static void CheckEntityJ(std::u8string const &id, CompoundTag const &entityE, CompoundTag const &entityA, CheckEntityJOptions options) {
   auto copyE = entityE.copy();
   auto copyA = entityA.copy();
+  NormalizeBlockStateFieldsJ(*copyE);
+  NormalizeBlockStateFieldsJ(*copyA);
 
   auto posE = props::GetPos3d(*copyE, u8"Pos");
   auto posA = props::GetPos3d(*copyA, u8"Pos");
@@ -752,6 +777,7 @@ static void CheckEntityJ(std::u8string const &id, CompoundTag const &entityE, Co
   unordered_set<u8string> blacklist = {
       u8"UUID",
       u8"Pos",
+      u8"DataVersion",
       u8"attributes",
       u8"Attributes",
       u8"Motion",
@@ -1224,7 +1250,7 @@ static void CheckChunkJ(mcfile::je::Region const &regionE, mcfile::je::Region co
   CHECK(chunkA->minBlockY() == chunkE->minBlockY());
   CHECK(chunkA->maxBlockY() == chunkE->maxBlockY());
 
-  CHECK(chunkE->getDataVersion() == chunkA->getDataVersion());
+  CHECK(chunkA->getDataVersion() == je2be::kJavaDataVersion);
 
   for (int y = chunkE->minBlockY(); y <= chunkE->maxBlockY(); y++) {
     for (int z = chunkE->minBlockZ() + 1; z < chunkE->maxBlockZ(); z++) {
@@ -1341,7 +1367,39 @@ static std::shared_ptr<CompoundTag> ReadLevelDatJ(fs::path const &p) {
   return CompoundTag::Read(s, Encoding::Java);
 }
 
-static void CheckLevelDatJ(fs::path const &pathE, fs::path const &pathA) {
+static CompoundTagPtr ReadLatestJavaPlayer(fs::path const &worldRoot) {
+  using namespace std;
+  auto dir = worldRoot / "players" / "data";
+  error_code ec;
+  if (!fs::is_directory(dir, ec)) {
+    return nullptr;
+  }
+  fs::path newest;
+  fs::file_time_type newestTime{};
+  for (auto const &it : fs::directory_iterator(dir, ec)) {
+    if (!it.is_regular_file()) {
+      continue;
+    }
+    if (!it.path().filename().string().ends_with(".dat")) {
+      continue;
+    }
+    auto t = it.last_write_time(ec);
+    if (ec) {
+      continue;
+    }
+    if (newest.empty() || t > newestTime) {
+      newest = it.path();
+      newestTime = t;
+    }
+  }
+  if (newest.empty()) {
+    return nullptr;
+  }
+  auto s = make_shared<mcfile::stream::GzFileInputStream>(newest);
+  return CompoundTag::Read(s, mcfile::Encoding::Java);
+}
+
+static void CheckLevelDatJ(fs::path const &pathE, fs::path const &pathA, fs::path const &worldA) {
   auto e = ReadLevelDatJ(pathE);
   auto a = ReadLevelDatJ(pathA);
   CHECK(e);
@@ -1377,6 +1435,9 @@ static void CheckLevelDatJ(fs::path const &pathE, fs::path const &pathA) {
       u8"hardcore",
       u8"initialized",
       u8"removed_features",
+      u8"DataVersion",
+      u8"singleplayer_uuid",
+      u8"Version",
   };
   unordered_set<u8string> ignoredGameRules = {
       u8"announceAdvancements",
@@ -1422,6 +1483,7 @@ static void CheckLevelDatJ(fs::path const &pathE, fs::path const &pathA) {
       u8"enteredNetherPosition", // TODO: exists when logged out from the nether
       u8"ignore_fall_damage_from_current_explosion",
       u8"spawn_extra_particles_on_fall",
+      u8"DataVersion",
   };
   for (u8string const &rule : ignoredPlayerAttributes) {
     blacklist.insert(u8"Player/" + rule);
@@ -1432,7 +1494,14 @@ static void CheckLevelDatJ(fs::path const &pathE, fs::path const &pathA) {
   }
   auto playerE = dataE->compoundTag(u8"Player");
   auto playerA = dataA->compoundTag(u8"Player");
-  CheckEntityJ(u8"player", *playerE, *playerA);
+  if (!playerA) {
+    playerA = ReadLatestJavaPlayer(worldA);
+  }
+  CHECK(playerE);
+  CHECK(playerA);
+  if (playerE && playerA) {
+    CheckEntityJ(u8"player", *playerE, *playerA);
+  }
 
   dataE->erase(u8"Player");
   dataA->erase(u8"Player");
@@ -1631,7 +1700,7 @@ static void TestJavaToBedrockToJava(fs::path in) {
   // Compare initial Java input and final Java output.
 
   if (checkLevelDat) {
-    CheckLevelDatJ(in / "level.dat", *outJ / "level.dat");
+    CheckLevelDatJ(in / "level.dat", *outJ / "level.dat", *outJ);
   }
 
   for (auto dim : {mcfile::Dimension::Overworld, mcfile::Dimension::Nether, mcfile::Dimension::End}) {

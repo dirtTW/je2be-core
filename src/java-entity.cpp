@@ -1072,11 +1072,11 @@ private:
     if (!blockState) {
       return;
     }
-    auto name = blockState->string(u8"Name");
-    if (!name) {
+    auto blockJ = mcfile::je::Block::FromCompoundTag(*blockState, ctx.fDataVersion.fTarget);
+    if (!blockJ) {
       return;
     }
-    auto block = BlockData::From(mcfile::je::Block::FromName(*name, ctx.fDataVersion.fTarget), nullptr, ctx.fDataVersion, {.fItem = true});
+    auto block = BlockData::From(blockJ, nullptr, ctx.fDataVersion, {.fItem = true});
     if (!block) {
       return;
     }
