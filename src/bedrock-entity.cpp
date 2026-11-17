@@ -2483,6 +2483,18 @@ public:
     return sTable.get();
   }
 
+  static void Cushion(CompoundTag const &b, CompoundTag &j, Context &, int) {
+    static std::u8string_view const colors[] = {
+        u8"white", u8"orange", u8"magenta", u8"light_blue", u8"yellow", u8"lime",
+        u8"pink", u8"gray", u8"light_gray", u8"cyan", u8"purple", u8"blue",
+        u8"brown", u8"green", u8"red", u8"black"};
+    auto variant = b.int32(u8"Variant");
+    if (!variant || *variant < 0 || *variant > 15) {
+      return;
+    }
+    j[u8"color"] = String(colors[15 - *variant]);
+  }
+
   static std::unordered_map<std::u8string_view, Converter> *CreateTable() {
     auto ret = new std::unordered_map<std::u8string_view, Converter>();
 
@@ -2496,6 +2508,7 @@ public:
     E(spider, C(Same, LivingEntity));
     E(bat, C(Same, LivingEntity, Bat));
     E(painting, C(Same, Base, Painting));
+    E(cushion, C(Same, Base, Cushion));
     E(zombie, C(Same, LivingEntity, IsBaby, CanBreakDoors, Zombie));
     E(chicken, C(Same, Animal, ClimateVariant, Chicken));
     E(item, C(Same, Base, Impl::Item));

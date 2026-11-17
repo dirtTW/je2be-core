@@ -668,6 +668,7 @@ private:
     E(iron_golem, C(Mob, Definitions({u8"+minecraft:iron_golem"}), IronGolem));
 
     E(item, Item);
+    E(cushion, C(EntityBase, Cushion));
     E(ender_dragon, EnderDragon);
     E(experience_orb, C(LivingEntity, Rename(u8"xp_orb"), ExperienceOrb));
     E(item_frame, Null);      // item_frame is tile entity in BE.
@@ -2136,6 +2137,23 @@ private:
 
     ctx.fCtx.fWorldData.addAutonomousEntity(c);
     return c;
+  }
+
+  static void Cushion(CompoundTag &c, CompoundTag const &tag, ConverterContext &) {
+    static std::u8string_view const colors[] = {
+        u8"white", u8"orange", u8"magenta", u8"light_blue", u8"yellow", u8"lime",
+        u8"pink", u8"gray", u8"light_gray", u8"cyan", u8"purple", u8"blue",
+        u8"brown", u8"green", u8"red", u8"black"};
+    auto color = tag.string(u8"color");
+    if (!color) {
+      return;
+    }
+    for (i32 i = 0; i < 16; i++) {
+      if (*color == colors[i]) {
+        c[u8"Variant"] = Int(15 - i);
+        return;
+      }
+    }
   }
 
   static CompoundTagPtr EntityBase(CompoundTag const &tag, ConverterContext &ctx) {
